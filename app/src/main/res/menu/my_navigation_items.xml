@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_home"
+        android:title="@string/text_home"
+        android:icon="@drawable/menu_home"/>
+
+    <item
+        android:id="@+id/action_select"
+        android:title="@string/text_select"
+        android:icon="@drawable/menu_select" />
+
+    <item
+        android:id="@+id/action_red_packet"
+        android:title="@string/red_packet"
+        android:icon="@drawable/menu_red_packet"/>
+
+    <item
+        android:id="@+id/action_search"
+        android:title="@string/text_search"
+        android:icon="@drawable/menu_search"/>
+
+</menu>

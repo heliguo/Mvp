@@ -1,8 +1,10 @@
-package com.lgh.mvp;
+package com.lgh.mvp.ui.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.lgh.mvp.R;
 
 public class MainActivity extends AppCompatActivity {
 
