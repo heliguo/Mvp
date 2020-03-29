@@ -1,6 +1,7 @@
 package com.lgh.mvp.ui.rvitem;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -32,7 +33,9 @@ public class PagerRvItem implements RViewItem<CategoryPager.DataBean> {
     @Override
     public void convert(RViewHolder holder, CategoryPager.DataBean dataBean, int i, Context context) {
         ImageView pic = holder.getView(R.id.goods_pic);
-        Glide.with(context).load("http:" + File.separator + dataBean.getPict_url()).into(pic);
+        Glide.with(context)
+                .load("http:" + File.separator + dataBean.getPict_url())
+                .into(pic);
         TextView title = holder.getView(R.id.goods_title);
         title.setText(dataBean.getTitle());
         TextView from = holder.getView(R.id.goods_from);
@@ -41,7 +44,9 @@ public class PagerRvItem implements RViewItem<CategoryPager.DataBean> {
         offPrice.setText(String.valueOf(dataBean.getCoupon_amount()));
         TextView originalPrice = holder.getView(R.id.goods_original_price);
         originalPrice.setText(String.valueOf(dataBean.getCoupon_start_fee()));
+        originalPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG);//删除线
         TextView soldout = holder.getView(R.id.goods_sold_out_count);
-        soldout.setText(String.valueOf(dataBean.getCoupon_remain_count()));
+        soldout.setText(String.format(context.getString(R.string.txt_goods_sold_count),
+                dataBean.getCoupon_remain_count()));
     }
 }

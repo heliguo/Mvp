@@ -65,7 +65,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/dp_10"
-                android:text="100百人购买"
+                android:text="@string/txt_goods_sold_count"
                 android:textColor="@color/gray" />
 
         </LinearLayout>
