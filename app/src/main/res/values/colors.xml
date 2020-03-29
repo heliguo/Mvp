@@ -2,5 +2,12 @@
 <resources>
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#F5A623</color> <!--主题色-->
-    <color name="colorAccent">#03DAC5</color><!--checkbox 等默认色-->
+    <color name="colorAccent">#F5A623</color><!--checkbox 等默认色-->
+
+    <color name="colorTabSelected">#ffffff</color>
+    <color name="colorTabNormal">#99ffffff</color>
+
+
+    <color name="item_text">#4A4A4A</color>
+
 </resources>

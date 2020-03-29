@@ -1,10 +1,10 @@
 package com.lgh.mvp.model.domain;
 
+import com.lgh.mvp.base.BaseBean;
+
 import java.util.List;
 
-import androidx.annotation.NonNull;
-
-public class Categories {
+public class Categories extends BaseBean {
 
     /**
      * success : true

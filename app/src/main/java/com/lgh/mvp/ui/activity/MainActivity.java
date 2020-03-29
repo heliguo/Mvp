@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -26,12 +27,13 @@ public class MainActivity extends AppCompatActivity {
     private SearchFragment mSearchFragment;
     private SelectFragment mSelectFragment;
     private RedPacketFragment mRedPacketFragment;
+    private Unbinder mUnbinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        mUnbinder = ButterKnife.bind(this);
         initFragment();
         initListener();
     }
@@ -74,4 +76,11 @@ public class MainActivity extends AppCompatActivity {
         ft.commit();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mUnbinder != null) {
+            mUnbinder.unbind();
+        }
+    }
 }

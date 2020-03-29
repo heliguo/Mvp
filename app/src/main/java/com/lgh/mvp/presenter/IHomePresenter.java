@@ -1,16 +1,10 @@
 package com.lgh.mvp.presenter;
 
+import com.lgh.mvp.base.IBasePresenter;
 import com.lgh.mvp.view.IHomeCallback;
 
-public interface IHomePresenter {
+public interface IHomePresenter extends IBasePresenter<IHomeCallback> {
 
-    /**
-     * 获取商品分类
-     */
     void getCategories();
-
-    void registerCallback(IHomeCallback callback);
-
-    void unregisterCallback(IHomeCallback callback);
 
 }

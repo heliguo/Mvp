@@ -5,5 +5,7 @@
     <string name="red_packet">特惠</string>
     <string name="text_search">搜索</string>
     <string name="txt_search_tips">搜你想搜的物品</string>
-    <string name="txt_title">领券联盟</string>
+    <string name="txt_title">logo</string>
+    <string name="txt_net_error">加载失败,点击重试</string>
+    <string name="goods_price_after_off">券后价:</string>
 </resources>

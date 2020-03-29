@@ -53,5 +53,7 @@ dependencies {
     //功能库（Zxing扫描与生成二维码条形码 支付宝 微信）
     implementation "com.github.tamsiree.RxTool:RxFeature:v2.4.1"
     implementation 'com.google.zxing:android-core:3.3.0'
-    implementation 'com.google.zxing:core:3.3.2'
+    implementation 'com.google.zxing:core:3.3.3'
+
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
 }
