@@ -4,4 +4,6 @@
     <string name="text_select">精选</string>
     <string name="red_packet">特惠</string>
     <string name="text_search">搜索</string>
+    <string name="txt_search_tips">搜你想搜的物品</string>
+    <string name="txt_title">领券联盟</string>
 </resources>

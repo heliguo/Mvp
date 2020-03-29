@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         ft.replace(R.id.main_fragment, fragment);
-        LogUtils.e(MainActivity.class, fragment.toString());
+        LogUtils.e(this, fragment.toString());
         ft.commit();
     }
 
