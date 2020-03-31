@@ -2,8 +2,16 @@ package com.lgh.mvp.ui.fragment.pager;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.lgh.multi_rv_library.RViewHelper;
 import com.lgh.multi_rv_library.SwipeRefreshHelper;
@@ -14,23 +22,41 @@ import com.lgh.mvp.base.BaseFragment;
 import com.lgh.mvp.model.domain.Categories;
 import com.lgh.mvp.model.domain.CategoryPager;
 import com.lgh.mvp.presenter.impl.HomePagerPresentImpl;
+import com.lgh.mvp.ui.adapter.LooperPagerAdapter;
 import com.lgh.mvp.ui.rvitem.PagerRvItem;
 import com.lgh.mvp.utils.Constants;
+import com.lgh.mvp.utils.LogUtils;
+import com.lgh.mvp.utils.SizeUtils;
 import com.lgh.mvp.view.ICategoryPagerCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 
 public class HomePagerFragment extends BaseFragment implements ICategoryPagerCallback,
         RViewCreate, SwipeRefreshHelper.SwipeRefreshListener {
 
+    private Context mContext;
     private HomePagerPresentImpl mPagerPresent;
     private int materialId;
+
+    @BindView(R.id.looper_vp)
+    ViewPager looperVp;
+    @BindView(R.id.home_pager_title)
+    TextView mTitle;
+    @BindView(R.id.looper_point_container)
+    LinearLayout mLinearLayout;
+    @BindView(R.id.select_point)
+    ImageView selectPoint;
+    private float selectPointPos;
+
+    private LooperPagerAdapter mLooperAdapter;
 
     public static HomePagerFragment getInstance(Categories.DataBean dataBean) {
         HomePagerFragment homePagerFragment = new HomePagerFragment();
@@ -48,8 +74,12 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
 
     @Override
     protected void initView(View rootView) {
+        mContext = getContext();
         helper = (new RViewHelper.Builder(this, this)).build();
         setStates(State.SUCCESS);
+        mLooperAdapter = new LooperPagerAdapter();
+        looperVp.setAdapter(mLooperAdapter);
+
     }
 
     @Override
@@ -62,6 +92,9 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
     protected void loadDatas() {
         Bundle bundle = getArguments();
         String title = bundle.getString(Constants.KEY_HOME_PAGER_TITLE);
+        if (!TextUtils.isEmpty(title)) {
+            mTitle.setText(title);
+        }
         materialId = bundle.getInt(Constants.KEY_HOME_PAGER_MATERIALID);
         if (mPagerPresent != null) {
             mPagerPresent.getContentByCategoryId(materialId);
@@ -112,6 +145,63 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
 
     @Override
     public void onLooperListLoaded(List<CategoryPager.DataBean> dataBeans, int categoryId) {
+        LogUtils.e(this, dataBeans.toString());
+        mLooperAdapter.setDatas(dataBeans);
+        // 保证imageViews的整数倍 Integer.MAX_VALUE=2147483647
+        int item = Integer.MAX_VALUE / 2 - Integer.MAX_VALUE / 2 % dataBeans.size();
+        looperVp.setCurrentItem(item);
+        mLinearLayout.removeAllViews();
+        GradientDrawable normalDrawable = (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.shape_point);
+        normalDrawable.setColor(ContextCompat.getColor(mContext, R.color.white));
+        for (int i = 0; i < dataBeans.size(); i++) {
+            View point = new View(mContext);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams
+                    (SizeUtils.dp2px(mContext, 8), SizeUtils.dp2px(mContext, 8));
+
+            if (i > 0)
+                layoutParams.leftMargin = SizeUtils.dp2px(mContext, 10);
+            point.setLayoutParams(layoutParams);
+            point.setBackground(normalDrawable);
+            mLinearLayout.addView(point);
+        }
+        looperVp.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                int p = position % dataBeans.size();
+                float distance = positionOffset * selectPointPos + selectPointPos * p;
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) selectPoint.getLayoutParams();
+                if (p == dataBeans.size() - 1) {
+                    if (positionOffset > 0.5) {
+                        params.leftMargin = 0;
+                    } else
+                        params.leftMargin = ((int) (selectPointPos * p));
+                } else {
+                    params.leftMargin = ((int) distance);
+                }
+                selectPoint.setLayoutParams(params);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        selectPoint.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        selectPointPos = mLinearLayout.getChildAt(1).getLeft() -
+                                mLinearLayout.getChildAt(0).getLeft();
+                        selectPoint.getViewTreeObserver()
+                                .removeOnGlobalLayoutListener(this);
+                    }
+                });
 
     }
 

@@ -3,7 +3,10 @@ package com.lgh.mvp.utils;
 public class UrilUtils {
 
     public static String createHomePagerUrl(int materialId, int page) {
-        return "discovery/" + materialId +"/"+ page;
+        return "discovery/" + materialId + "/" + page;
     }
 
+    public static String getCoverPath(String pict_url) {
+        return "https:" + pict_url;
+    }
 }

@@ -78,11 +78,14 @@ public class HomePagerPresentImpl implements ICategoryPagerPresenter {
     }
 
     private void handlerHomepagerContentResult(CategoryPager body, int id) {
+        List<CategoryPager.DataBean> data = body.getData();
         for (ICategoryPagerCallback callback : mCallbacks) {
             if (callback.materialId() == id) {
                 if (body == null || body.getData().size() == 0) {
                     callback.onEmpty(id);
                 } else {
+                    List<CategoryPager.DataBean> dataBeans = data.subList(data.size() - 5, data.size());
+                    callback.onLooperListLoaded(dataBeans, id);
                     callback.onCategorLoaded(body);
                 }
             }
