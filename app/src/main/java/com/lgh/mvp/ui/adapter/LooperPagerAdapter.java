@@ -35,6 +35,8 @@ public class LooperPagerAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
+        if (dataBeans.size()==1)
+            return 1;
         return Integer.MAX_VALUE;
     }
 

@@ -34,7 +34,7 @@ public class PagerRvItem implements RViewItem<CategoryPager.DataBean> {
     public void convert(RViewHolder holder, CategoryPager.DataBean dataBean, int i, Context context) {
         ImageView pic = holder.getView(R.id.goods_pic);
         Glide.with(context)
-                .load("http:" + File.separator + dataBean.getPict_url())
+                .load("http:" + dataBean.getPict_url())
                 .into(pic);
         TextView title = holder.getView(R.id.goods_title);
         title.setText(dataBean.getTitle());

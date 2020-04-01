@@ -4,8 +4,9 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
@@ -29,6 +30,7 @@ import com.lgh.mvp.utils.LogUtils;
 import com.lgh.mvp.utils.SizeUtils;
 import com.lgh.mvp.view.ICategoryPagerCallback;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,6 +69,31 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
         return homePagerFragment;
     }
 
+    /**
+     * 实例化一个Handler 让轮播自动循环
+     */
+
+    private static class LooperHandler extends Handler{
+
+        private final WeakReference<HomePagerFragment> mReference;
+
+        private LooperHandler(HomePagerFragment reference) {
+            mReference = new WeakReference<>(reference);
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            HomePagerFragment fragment = mReference.get();
+            if (fragment!=null){
+                int item = fragment.looperVp.getCurrentItem() + 1;
+                fragment.looperVp.setCurrentItem(item);
+                fragment.mHandler.sendEmptyMessageDelayed(0, 2000);
+            }
+        }
+    }
+
+    private final LooperHandler mHandler = new LooperHandler(this);
+
     @Override
     protected int getLayoutId() {
         return R.layout.fragment_home_pager;
@@ -75,11 +102,12 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
     @Override
     protected void initView(View rootView) {
         mContext = getContext();
-        helper = (new RViewHelper.Builder(this, this)).build();
+
+        (new RViewHelper.Builder(this, this)).build();
         setStates(State.SUCCESS);
         mLooperAdapter = new LooperPagerAdapter();
         looperVp.setAdapter(mLooperAdapter);
-
+        mHandler.sendEmptyMessageDelayed(0, 1000);
     }
 
     @Override
@@ -189,7 +217,15 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
             @Override
             public void onPageScrollStateChanged(int state) {
 
+                if (state == ViewPager.SCROLL_STATE_DRAGGING) { // 拖动
+                    mHandler.removeCallbacksAndMessages(null);
+                } else if (state == ViewPager.SCROLL_STATE_SETTLING) { // 持续(滚动)
+                    mHandler.removeCallbacksAndMessages(null);
+                } else if (state == ViewPager.SCROLL_STATE_IDLE) { // 闲置(静止)
+                    mHandler.sendEmptyMessageDelayed(0, 2000);
+                }
             }
+
         });
 
         selectPoint.getViewTreeObserver().addOnGlobalLayoutListener(
@@ -209,11 +245,11 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
     protected void release() {
         if (mPagerPresent != null) {
             mPagerPresent.unregisterCallback(this);
+            mHandler.removeCallbacksAndMessages(null);
         }
 
     }
 
-    private RViewHelper helper;
     @BindView(R.id.rv_home_pager_content)
     RecyclerView mRecyclerView;
     private List<CategoryPager.DataBean> mDataBeanList = new ArrayList<>();
@@ -254,4 +290,5 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
     public void OnRefresh() {
 
     }
+
 }
