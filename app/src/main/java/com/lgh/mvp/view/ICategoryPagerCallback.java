@@ -11,7 +11,7 @@ public interface ICategoryPagerCallback extends IBaseCallback<CategoryPager> {
 
     void onLoaderMoreError(int id);
 
-    void onLoaderEmpty(int id);
+    void onLoaderMoreEmpty(int id);
 
     /**
      * 加载更多

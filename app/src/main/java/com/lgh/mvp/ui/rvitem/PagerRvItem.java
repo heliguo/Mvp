@@ -6,12 +6,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.lgh.multi_rv_library.holder.RViewHolder;
-import com.lgh.multi_rv_library.model.RViewItem;
 import com.lgh.mvp.R;
 import com.lgh.mvp.model.domain.CategoryPager;
-
-import java.io.File;
+import com.lgh.rvlibrary.multi_rv_library.holder.RViewHolder;
+import com.lgh.rvlibrary.multi_rv_library.model.RViewItem;
 
 public class PagerRvItem implements RViewItem<CategoryPager.DataBean> {
 
@@ -31,8 +29,9 @@ public class PagerRvItem implements RViewItem<CategoryPager.DataBean> {
     }
 
     @Override
-    public void convert(RViewHolder holder, CategoryPager.DataBean dataBean, int i, Context context) {
+    public void convert(RViewHolder holder, CategoryPager.DataBean dataBean, int i) {
         ImageView pic = holder.getView(R.id.goods_pic);
+        Context context = holder.itemView.getContext();
         Glide.with(context)
                 .load("http:" + dataBean.getPict_url())
                 .into(pic);

@@ -14,10 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.lgh.multi_rv_library.RViewHelper;
-import com.lgh.multi_rv_library.SwipeRefreshHelper;
-import com.lgh.multi_rv_library.base.RViewAdapter;
-import com.lgh.multi_rv_library.core.RViewCreate;
+import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
+import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.lgh.mvp.R;
 import com.lgh.mvp.base.BaseFragment;
 import com.lgh.mvp.model.domain.Categories;
@@ -26,9 +24,12 @@ import com.lgh.mvp.presenter.impl.HomePagerPresentImpl;
 import com.lgh.mvp.ui.adapter.LooperPagerAdapter;
 import com.lgh.mvp.ui.rvitem.PagerRvItem;
 import com.lgh.mvp.utils.Constants;
-import com.lgh.mvp.utils.LogUtils;
 import com.lgh.mvp.utils.SizeUtils;
 import com.lgh.mvp.view.ICategoryPagerCallback;
+import com.lgh.rvlibrary.multi_rv_library.RViewHelper;
+import com.lgh.rvlibrary.multi_rv_library.SwipeRefreshHelper;
+import com.lgh.rvlibrary.multi_rv_library.base.RViewAdapter;
+import com.lgh.rvlibrary.multi_rv_library.core.RViewCreate;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -58,7 +59,12 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
     ImageView selectPoint;
     private float selectPointPos;
 
+    @BindView(R.id.home_pager_refresh)
+    TwinklingRefreshLayout mRefreshLayout;
+
     private LooperPagerAdapter mLooperAdapter;
+
+    private RViewAdapter<CategoryPager.DataBean> mAdapter;
 
     public static HomePagerFragment getInstance(Categories.DataBean dataBean) {
         HomePagerFragment homePagerFragment = new HomePagerFragment();
@@ -73,7 +79,7 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
      * 实例化一个Handler 让轮播自动循环
      */
 
-    private static class LooperHandler extends Handler{
+    private static class LooperHandler extends Handler {
 
         private final WeakReference<HomePagerFragment> mReference;
 
@@ -84,7 +90,7 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
         @Override
         public void handleMessage(@NonNull Message msg) {
             HomePagerFragment fragment = mReference.get();
-            if (fragment!=null){
+            if (fragment != null) {
                 int item = fragment.looperVp.getCurrentItem() + 1;
                 fragment.looperVp.setCurrentItem(item);
                 fragment.mHandler.sendEmptyMessageDelayed(0, 2000);
@@ -101,13 +107,27 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
 
     @Override
     protected void initView(View rootView) {
+        setStates(State.SUCCESS);
         mContext = getContext();
 
         (new RViewHelper.Builder(this, this)).build();
-        setStates(State.SUCCESS);
+
         mLooperAdapter = new LooperPagerAdapter();
         looperVp.setAdapter(mLooperAdapter);
+
         mHandler.sendEmptyMessageDelayed(0, 1000);
+
+        mRefreshLayout.setEnableRefresh(false);
+        mRefreshLayout.setEnableLoadmore(true);
+        mRefreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
+            @Override
+            public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
+                if (mPagerPresent != null) {
+                    mPagerPresent.loadMore(materialId);
+                }
+            }
+
+        });
     }
 
     @Override
@@ -134,10 +154,14 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
         mDataBeanList.clear();
         mDataBeanList.addAll(categoryPager.getData());
         setStates(State.SUCCESS);
+        mRefreshLayout.setEnableLoadmore(true);
     }
 
     @Override
     public void onError(Object... objects) {
+        if (mRefreshLayout != null) {
+            mRefreshLayout.setEnableLoadmore(false);
+        }
         setStates(State.ERROR);
     }
 
@@ -148,6 +172,9 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
 
     @Override
     public void onEmpty(Object... objects) {
+        if (mRefreshLayout != null) {
+            mRefreshLayout.setEnableLoadmore(false);
+        }
         setStates(State.EMPTY);
     }
 
@@ -158,22 +185,29 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
 
     @Override
     public void onLoaderMoreError(int id) {
-
+        if (mRefreshLayout != null) {
+            mRefreshLayout.finishLoadmore();
+        }
     }
 
     @Override
-    public void onLoaderEmpty(int id) {
-
+    public void onLoaderMoreEmpty(int id) {
+        if (mRefreshLayout != null) {
+            mRefreshLayout.finishLoadmore();
+        }
     }
 
     @Override
     public void onLoaderMoreLoading(List<CategoryPager.DataBean> dataBeans, int categoryId) {
-        setStates(State.SUCCESS);
+        if (mRefreshLayout != null) {
+            mRefreshLayout.finishLoadmore();
+        }
+        mAdapter.addDatasRange(dataBeans);
+
     }
 
     @Override
     public void onLooperListLoaded(List<CategoryPager.DataBean> dataBeans, int categoryId) {
-        LogUtils.e(this, dataBeans.toString());
         mLooperAdapter.setDatas(dataBeans);
         // 保证imageViews的整数倍 Integer.MAX_VALUE=2147483647
         int item = Integer.MAX_VALUE / 2 - Integer.MAX_VALUE / 2 % dataBeans.size();
@@ -238,7 +272,6 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
                                 .removeOnGlobalLayoutListener(this);
                     }
                 });
-
     }
 
     @Override
@@ -278,7 +311,8 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
 
     @Override
     public RViewAdapter createRViewAdapter() {
-        return new RViewAdapter<>(mDataBeanList, new PagerRvItem());
+        mAdapter = new RViewAdapter<>(mDataBeanList, new PagerRvItem());
+        return mAdapter;
     }
 
     @Override

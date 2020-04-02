@@ -1,8 +1,11 @@
 package com.lgh.mvp.presenter.impl;
 
+import android.util.Log;
+
 import com.lgh.mvp.model.Api;
 import com.lgh.mvp.model.domain.CategoryPager;
 import com.lgh.mvp.presenter.ICategoryPagerPresenter;
+import com.lgh.mvp.utils.LogUtils;
 import com.lgh.mvp.utils.RetrofitManaer;
 import com.lgh.mvp.utils.UrilUtils;
 import com.lgh.mvp.view.ICategoryPagerCallback;
@@ -24,6 +27,8 @@ public class HomePagerPresentImpl implements ICategoryPagerPresenter {
 
     private static final int DEFAULT_PAGE = 1;
 
+    private Integer currentPage;//当前页
+
     private static HomePagerPresentImpl sInstance = null;
 
     public static HomePagerPresentImpl getInstance() {
@@ -41,14 +46,11 @@ public class HomePagerPresentImpl implements ICategoryPagerPresenter {
                 callback.onLoading(id);
             }
         }
-        Retrofit retrofit = RetrofitManaer.getInstance().getRetrofit();
-        Api api = retrofit.create(Api.class);
-        Integer page = pages.get(id);
-        if (page == null) {
-            page = DEFAULT_PAGE;
+        currentPage = pages.get(id);
+        if (currentPage == null) {
+            currentPage = DEFAULT_PAGE;
         }
-        String homePagerUrl = UrilUtils.createHomePagerUrl(id, page);
-        Call<CategoryPager> categoryPager = api.getCategoryPager(homePagerUrl);
+        Call<CategoryPager> categoryPager = createTask(id, currentPage);
         categoryPager.enqueue(new Callback<CategoryPager>() {
             @Override
             public void onResponse(Call<CategoryPager> call, Response<CategoryPager> response) {
@@ -68,12 +70,18 @@ public class HomePagerPresentImpl implements ICategoryPagerPresenter {
         });
     }
 
+    private Call<CategoryPager> createTask(int id, Integer page) {
+        Retrofit retrofit = RetrofitManaer.getInstance().getRetrofit();
+        Api api = retrofit.create(Api.class);
+        String homePagerUrl = UrilUtils.createHomePagerUrl(id, page);
+        return api.getCategoryPager(homePagerUrl);
+    }
+
     private void handlerNetWorkError(int id) {
         for (ICategoryPagerCallback callback : mCallbacks) {
             if (callback.materialId() == id) {
                 callback.onError(id);
             }
-
         }
     }
 
@@ -87,6 +95,7 @@ public class HomePagerPresentImpl implements ICategoryPagerPresenter {
                     List<CategoryPager.DataBean> dataBeans = data.subList(data.size() - 5, data.size());
                     callback.onLooperListLoaded(dataBeans, id);
                     callback.onCategorLoaded(body);
+                    pages.put(id, currentPage);
                 }
             }
         }
@@ -94,7 +103,54 @@ public class HomePagerPresentImpl implements ICategoryPagerPresenter {
 
     @Override
     public void loadMore(int id) {
+        //当前页、增加页码、加载数据、处理数据结果
+        currentPage = pages.get(id);
+        if (currentPage == null) {
+            return;
+        }
+        currentPage++;
+        Call<CategoryPager> categoryPager = createTask(id, currentPage);
+        categoryPager.enqueue(new Callback<CategoryPager>() {
+            @Override
+            public void onResponse(Call<CategoryPager> call, Response<CategoryPager> response) {
+                int code = response.code();
+                if (code == HttpURLConnection.HTTP_OK) {
+                    handlerNetWorkLoadMoreResult(response.body(), id);
 
+                } else {
+                    handlerNetWorkLoadMoreError(id);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CategoryPager> call, Throwable t) {
+                handlerNetWorkLoadMoreError(id);
+            }
+        });
+    }
+
+    private void handlerNetWorkLoadMoreResult(CategoryPager body, int id) {
+        for (ICategoryPagerCallback callback : mCallbacks) {
+            if (callback.materialId() == id) {
+                if (body == null || body.getData().size() == 0) {
+                    callback.onLoaderMoreEmpty(id);
+                    currentPage--;
+                } else {
+                    callback.onLoaderMoreLoading(body.getData(), id);
+                    pages.put(id, currentPage);
+                }
+            }
+        }
+    }
+
+
+    private void handlerNetWorkLoadMoreError(int id) {
+        currentPage--;
+        for (ICategoryPagerCallback callback : mCallbacks) {
+            if (callback.materialId() == id) {
+                callback.onLoaderMoreError(id);
+            }
+        }
     }
 
     @Override
