@@ -23,7 +23,6 @@ public class RViewAdapter<T> extends RecyclerView.Adapter<RViewHolder> {
     private RViewItemManager<T> itemStyle;//条目类型管理
     private ItemListener<T> itemListener;//item点击事件监听
     private List<T> mDatas;//数据源
-    private Context mContext;
 
 
     //单一布局
@@ -60,7 +59,7 @@ public class RViewAdapter<T> extends RecyclerView.Adapter<RViewHolder> {
     @NonNull
     @Override
     public RViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        mContext = parent.getContext();
+        Context context = parent.getContext();
         RViewItem rViewItem = itemStyle.getRViewItem(viewType);
         RViewHolder holder = RViewHolder.createViewHolder(parent.getContext(), parent, rViewItem.getItemLayout());
         if (rViewItem.openClick()) setListener(holder);
@@ -143,5 +142,4 @@ public class RViewAdapter<T> extends RecyclerView.Adapter<RViewHolder> {
         this.mDatas.addAll(datas);
         notifyItemRangeChanged(size, datas.size());
     }
-
 }

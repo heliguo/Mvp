@@ -1,25 +1,20 @@
 package com.lgh.mvp.ui.activity;
 
-import android.os.Bundle;
-
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.lgh.mvp.R;
+import com.lgh.mvp.base.BaseActivity;
 import com.lgh.mvp.base.BaseFragment;
 import com.lgh.mvp.ui.fragment.HomeFragment;
 import com.lgh.mvp.ui.fragment.RedPacketFragment;
 import com.lgh.mvp.ui.fragment.SearchFragment;
 import com.lgh.mvp.ui.fragment.SelectFragment;
-import com.lgh.mvp.utils.LogUtils;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     @BindView(R.id.main_navigation_bar)
     BottomNavigationView navigationView;
@@ -27,18 +22,10 @@ public class MainActivity extends AppCompatActivity {
     private SearchFragment mSearchFragment;
     private SelectFragment mSelectFragment;
     private RedPacketFragment mRedPacketFragment;
-    private Unbinder mUnbinder;
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mUnbinder = ButterKnife.bind(this);
-        initFragment();
-        initListener();
-    }
-
-    private void initFragment() {
+    protected void initView() {
         mHomeFragment = new HomeFragment();
         mSelectFragment = new SelectFragment();
         mRedPacketFragment = new RedPacketFragment();
@@ -46,7 +33,13 @@ public class MainActivity extends AppCompatActivity {
         swichFragment(mHomeFragment);
     }
 
-    private void initListener() {
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    public void initListener() {
         navigationView.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.action_home:
@@ -68,19 +61,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
+    private BaseFragment lastFragment = null;
+
     private void swichFragment(BaseFragment fragment) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.main_fragment, fragment);
-        LogUtils.e(this, fragment.toString());
+        if (!fragment.isAdded()) {
+            ft.add(R.id.main_fragment, fragment);
+        } else {
+            ft.show(fragment);
+        }
+        if (lastFragment != null) {
+            ft.hide(lastFragment);
+        }
+        lastFragment = fragment;
+//        ft.replace(R.id.main_fragment, fragment);//会销毁重建
         ft.commit();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mUnbinder != null) {
-            mUnbinder.unbind();
-        }
-    }
+
 }

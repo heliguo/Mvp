@@ -2,12 +2,14 @@ package com.lgh.mvp.ui.rvitem;
 
 import android.content.Context;
 import android.graphics.Paint;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.lgh.mvp.R;
 import com.lgh.mvp.model.domain.CategoryPager;
+import com.lgh.mvp.utils.UrilUtils;
 import com.lgh.rvlibrary.multi_rv_library.holder.RViewHolder;
 import com.lgh.rvlibrary.multi_rv_library.model.RViewItem;
 
@@ -31,9 +33,15 @@ public class PagerRvItem implements RViewItem<CategoryPager.DataBean> {
     @Override
     public void convert(RViewHolder holder, CategoryPager.DataBean dataBean, int i) {
         ImageView pic = holder.getView(R.id.goods_pic);
+        ViewGroup.LayoutParams layoutParams = pic.getLayoutParams();
+        int width = layoutParams.width;
+        int height = layoutParams.height;
+        int coverSize = (Math.max(width, height)) / 2;
+//        LogUtils.e(PagerRvItem.class, "picture width:  " + width
+//                + "   picture heigt:  " + height);
         Context context = holder.itemView.getContext();
         Glide.with(context)
-                .load("http:" + dataBean.getPict_url())
+                .load(UrilUtils.getCoverPath(dataBean.getPict_url(), coverSize))
                 .into(pic);
         TextView title = holder.getView(R.id.goods_title);
         title.setText(dataBean.getTitle());

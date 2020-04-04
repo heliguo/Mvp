@@ -8,6 +8,7 @@ import com.lgh.mvp.base.BaseFragment;
 import com.lgh.mvp.model.domain.Categories;
 import com.lgh.mvp.presenter.impl.HomePresenterImpl;
 import com.lgh.mvp.ui.adapter.HomePagerAdapter;
+import com.lgh.mvp.utils.PresenterManager;
 import com.lgh.mvp.view.IHomeCallback;
 
 import androidx.viewpager.widget.ViewPager;
@@ -35,7 +36,7 @@ public class HomeFragment extends BaseFragment implements IHomeCallback {
 
     @Override
     protected void initPresenter() {
-        mHomePresenter = new HomePresenterImpl();
+        mHomePresenter = PresenterManager.getInstance().getHomePresenter();
         mHomePresenter.registerCallback(this);
     }
 

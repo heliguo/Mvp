@@ -43,4 +43,6 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
         mDataBeans.addAll(datas);
         notifyDataSetChanged();
     }
+
+
 }

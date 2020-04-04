@@ -29,15 +29,6 @@ public class HomePagerPresentImpl implements ICategoryPagerPresenter {
 
     private Integer currentPage;//当前页
 
-    private static HomePagerPresentImpl sInstance = null;
-
-    public static HomePagerPresentImpl getInstance() {
-        if (sInstance == null) {
-            sInstance = new HomePagerPresentImpl();
-        }
-        return sInstance;
-    }
-
 
     @Override
     public void getContentByCategoryId(int id) {

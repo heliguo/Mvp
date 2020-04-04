@@ -1,13 +1,16 @@
 package com.lgh.mvp.ui.fragment.pager;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -21,15 +24,23 @@ import com.lgh.mvp.base.BaseFragment;
 import com.lgh.mvp.model.domain.Categories;
 import com.lgh.mvp.model.domain.CategoryPager;
 import com.lgh.mvp.presenter.impl.HomePagerPresentImpl;
+import com.lgh.mvp.presenter.impl.TicketPresenterImpl;
+import com.lgh.mvp.ui.activity.TicketActivity;
 import com.lgh.mvp.ui.adapter.LooperPagerAdapter;
+import com.lgh.mvp.ui.custom.CustomNestedScrollView;
+import com.lgh.mvp.ui.custom.CustomRecyclerview;
 import com.lgh.mvp.ui.rvitem.PagerRvItem;
 import com.lgh.mvp.utils.Constants;
+import com.lgh.mvp.utils.LogUtils;
+import com.lgh.mvp.utils.PresenterManager;
 import com.lgh.mvp.utils.SizeUtils;
+import com.lgh.mvp.utils.ToastUtils;
 import com.lgh.mvp.view.ICategoryPagerCallback;
 import com.lgh.rvlibrary.multi_rv_library.RViewHelper;
 import com.lgh.rvlibrary.multi_rv_library.SwipeRefreshHelper;
 import com.lgh.rvlibrary.multi_rv_library.base.RViewAdapter;
 import com.lgh.rvlibrary.multi_rv_library.core.RViewCreate;
+import com.lgh.rvlibrary.multi_rv_library.listener.ItemListener;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -49,6 +60,8 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
     private HomePagerPresentImpl mPagerPresent;
     private int materialId;
 
+    @BindView(R.id.home_rv_height)
+    LinearLayout mLlRvContainer;
     @BindView(R.id.looper_vp)
     ViewPager looperVp;
     @BindView(R.id.home_pager_title)
@@ -58,9 +71,12 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
     @BindView(R.id.select_point)
     ImageView selectPoint;
     private float selectPointPos;
-
     @BindView(R.id.home_pager_refresh)
     TwinklingRefreshLayout mRefreshLayout;
+    @BindView(R.id.custom_nested_scroll_view)
+    CustomNestedScrollView mScrollView;
+    @BindView(R.id.home_pager_no_scroll_ll)
+    LinearLayout noScrollViewLl;
 
     private LooperPagerAdapter mLooperAdapter;
 
@@ -93,6 +109,7 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
             if (fragment != null) {
                 int item = fragment.looperVp.getCurrentItem() + 1;
                 fragment.looperVp.setCurrentItem(item);
+                LogUtils.e(HomePagerFragment.class, "looping... ");
                 fragment.mHandler.sendEmptyMessageDelayed(0, 2000);
             }
         }
@@ -109,9 +126,8 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
     protected void initView(View rootView) {
         setStates(State.SUCCESS);
         mContext = getContext();
-
         (new RViewHelper.Builder(this, this)).build();
-
+        looperVp.setTag(materialId);
         mLooperAdapter = new LooperPagerAdapter();
         looperVp.setAdapter(mLooperAdapter);
 
@@ -119,6 +135,11 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
 
         mRefreshLayout.setEnableRefresh(false);
         mRefreshLayout.setEnableLoadmore(true);
+
+    }
+
+    @Override
+    public void initListener() {
         mRefreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
             @Override
             public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
@@ -128,11 +149,60 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
             }
 
         });
+
+        mLlRvContainer.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                int measuredHeight = mLlRvContainer.getMeasuredHeight();
+                if (measuredHeight != 0)
+                    mLlRvContainer.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                ViewGroup.LayoutParams layoutParams = mRecyclerView.getLayoutParams();
+                layoutParams.height = measuredHeight;
+                mRecyclerView.setLayoutParams(layoutParams);
+            }
+        });
+
+        noScrollViewLl.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                int noScrollViewLlHeight = noScrollViewLl.getMeasuredHeight();
+                if (noScrollViewLlHeight != 0) {
+//                    mScrollView.setRvHeight(noScrollViewLlHeight);
+                    noScrollViewLl.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+            }
+        });
+        mRecyclerView.setNestedScrollingEnabled(false);
+
+        mAdapter.setItemListener(new ItemListener<CategoryPager.DataBean>() {
+            @Override
+            public void onItemClick(View view, CategoryPager.DataBean entity, int position) {
+                Log.e("TAG", "onItemClick: ");
+                TicketPresenterImpl ticketPresenter = PresenterManager.
+                        getInstance().getTicketPresenter();
+                startActivity(new Intent(mContext, TicketActivity.class));
+                String title = entity.getTitle();
+                String pict_url = entity.getPict_url();
+                String click_url = entity.getClick_url();
+                ticketPresenter.getTicket(title, click_url, pict_url);
+                view.findViewById(R.id.goods_pic).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.e("doid", "onClick: " + "图片点击");
+                    }
+                });
+            }
+
+            @Override
+            public boolean onItemLongClick(View view, CategoryPager.DataBean entity, int position) {
+                return false;
+            }
+        });
     }
 
     @Override
     protected void initPresenter() {
-        mPagerPresent = HomePagerPresentImpl.getInstance();
+        mPagerPresent = PresenterManager.getInstance().getHomePagerPresent();
         mPagerPresent.registerCallback(this);
     }
 
@@ -195,6 +265,7 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
         if (mRefreshLayout != null) {
             mRefreshLayout.finishLoadmore();
         }
+        ToastUtils.showToast("没有更多数据了");
     }
 
     @Override
@@ -203,7 +274,7 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
             mRefreshLayout.finishLoadmore();
         }
         mAdapter.addDatasRange(dataBeans);
-
+        ToastUtils.showToast("加载了" + dataBeans.size() + "条数据");
     }
 
     @Override
@@ -213,8 +284,7 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
         int item = Integer.MAX_VALUE / 2 - Integer.MAX_VALUE / 2 % dataBeans.size();
         looperVp.setCurrentItem(item);
         mLinearLayout.removeAllViews();
-        GradientDrawable normalDrawable = (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.shape_point);
-        normalDrawable.setColor(ContextCompat.getColor(mContext, R.color.white));
+        GradientDrawable normalDrawable = (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.shape_point_normal);
         for (int i = 0; i < dataBeans.size(); i++) {
             View point = new View(mContext);
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams
@@ -266,13 +336,19 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
-                        selectPointPos = mLinearLayout.getChildAt(1).getLeft() -
-                                mLinearLayout.getChildAt(0).getLeft();
-                        selectPoint.getViewTreeObserver()
-                                .removeOnGlobalLayoutListener(this);
+                        if (mLinearLayout != null && mLinearLayout.getChildCount() > 1) {
+                            selectPointPos = mLinearLayout.getChildAt(1).getLeft() -
+                                    mLinearLayout.getChildAt(0).getLeft();
+                            if (selectPointPos != 0) {
+                                selectPoint.getViewTreeObserver()
+                                        .removeOnGlobalLayoutListener(this);
+                            }
+
+                        }
                     }
                 });
     }
+
 
     @Override
     protected void release() {
@@ -284,7 +360,7 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
     }
 
     @BindView(R.id.rv_home_pager_content)
-    RecyclerView mRecyclerView;
+    CustomRecyclerview mRecyclerView;
     private List<CategoryPager.DataBean> mDataBeanList = new ArrayList<>();
 
     @Override

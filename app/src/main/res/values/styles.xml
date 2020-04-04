@@ -8,4 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <declare-styleable name="AutoLoopViewPager">
+        <attr name="atuo_duration" format="integer" />
+    </declare-styleable>
+
 </resources>
