@@ -10,4 +10,6 @@
 
     <color name="item_text">#4A4A4A</color>
 
+    <color name="ticket_edittext_color">#D1CED1</color>
+
 </resources>

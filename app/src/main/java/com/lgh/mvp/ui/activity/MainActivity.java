@@ -39,6 +39,11 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
+    protected void initPresenter() {
+
+    }
+
+    @Override
     public void initListener() {
         navigationView.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {

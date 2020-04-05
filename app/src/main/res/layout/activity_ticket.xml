@@ -4,4 +4,58 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_40"
+        android:background="@color/colorPrimaryDark">
+
+
+        <ImageView
+            android:id="@+id/ticket_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dp_10"
+            android:src="@drawable/ticket_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/txt_ticket_title"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/ticket_pic"
+        android:layout_width="@dimen/dp_300"
+        android:layout_height="@dimen/dp_300"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/dp_30"
+        android:background="@drawable/shape_ticket_edittext"
+        android:focusable="false"
+        android:gravity="center"
+        android:text="272727288"
+        android:textColor="@color/ticket_edittext_color"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/ticket_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/dp_30"
+        android:background="@drawable/shape_ticket_btn"
+        android:gravity="center"
+        android:text="7389"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+
 </LinearLayout>

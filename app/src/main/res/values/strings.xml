@@ -9,4 +9,5 @@
     <string name="txt_net_error">加载失败,点击重试</string>
     <string name="goods_price_after_off">券后价:</string>
     <string name="txt_goods_sold_count">%1$d人已购买</string>
+    <string name="txt_ticket_title">淘口令</string>
 </resources>
