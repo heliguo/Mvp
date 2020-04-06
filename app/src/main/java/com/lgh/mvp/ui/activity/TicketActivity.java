@@ -1,10 +1,19 @@
 package com.lgh.mvp.ui.activity;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.lgh.mvp.R;
@@ -12,9 +21,13 @@ import com.lgh.mvp.base.BaseActivity;
 import com.lgh.mvp.model.domain.TicketBeans;
 import com.lgh.mvp.presenter.impl.TicketPresenterImpl;
 import com.lgh.mvp.ui.custom.loadview.PageLayout;
-import com.lgh.mvp.utils.LogUtils;
 import com.lgh.mvp.utils.PresenterManager;
 import com.lgh.mvp.view.ITicketCallBack;
+
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 public class TicketActivity extends BaseActivity implements ITicketCallBack {
 
@@ -22,6 +35,8 @@ public class TicketActivity extends BaseActivity implements ITicketCallBack {
     private View rootView;
     public PageLayout.Builder mBuilder;
     public PageLayout mPageLayout;
+    private boolean hasTaoBao;
+    private Button btn;
 
     @Override
     protected int getLayoutId() {
@@ -34,8 +49,8 @@ public class TicketActivity extends BaseActivity implements ITicketCallBack {
         if (mTicketPresenter != null) {
             mTicketPresenter.registerCallback(this);
         }
-
     }
+
 
     @Override
     protected void initView() {
@@ -51,17 +66,51 @@ public class TicketActivity extends BaseActivity implements ITicketCallBack {
     @Override
     public void onLoadSuccess(TicketBeans ticketBeans, Object... objects) {
         mPageLayout.showCustom();
+
+        /**
+         * 判断是否安装淘宝
+         * adb shell
+         * logcat | grep START
+         */
+        // {act=android.intent.action.VIEW flg=0x4000000 hwFlg=0x10
+        // pkg=com.taobao.taobao
+        // cmp=com.taobao.taobao/com.taobao.tao.TBMainActivity (has extras)}
+        PackageManager pm = getPackageManager();
+        try {
+            PackageInfo packageInfo = pm.getPackageInfo("com.taobao.taobao",
+                    PackageManager.MATCH_UNINSTALLED_PACKAGES);
+            hasTaoBao = packageInfo != null;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            hasTaoBao = false;
+        }
+
         EditText ev = rootView.findViewById(R.id.ticket_tao_kl);
         ImageView iv = rootView.findViewById(R.id.ticket_pic);
-        Button btn = rootView.findViewById(R.id.ticket_btn);
-        if (ev != null && iv != null && btn != null) {
-            String cover = "http:" + (String) objects[0];
-            Glide.with(TicketActivity.this).load(cover).into(iv);
-            ev.setText("￥xhQoYC66sMX￥");
-            btn.setOnClickListener(v -> {
-                LogUtils.e(this, "淘口令:  " + ev.getText().toString());
-            });
-        }
+        btn = rootView.findViewById(R.id.ticket_btn);
+
+        btn.setText(hasTaoBao ? "打开淘宝领券" : "复制口令");
+        String cover = "http:" + (String) objects[0];
+        Glide.with(TicketActivity.this).load(cover).into(iv);
+        ev.setText("￥xhQoYC66sMX￥");
+        btn.setOnClickListener(v -> {
+            String ticketCode = ev.getText().toString().trim();
+            //复制到剪切板
+            ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clipData = ClipData.newPlainText("taobao_ticket_code", ticketCode);
+            cm.setPrimaryClip(clipData);
+            //有淘宝打开，没有提示
+            if (hasTaoBao) {
+                Intent intent = new Intent();
+                ComponentName componentName = new ComponentName("com.taobao.taobao",
+                        "com.taobao.tao.TBMainActivity");
+                intent.setComponent(componentName);
+                startActivity(intent);
+            } else {
+                Toast.makeText(TicketActivity.this, "口令复制成功", Toast.LENGTH_SHORT).show();
+            }
+
+        });
     }
 
     @Override

@@ -65,6 +65,7 @@ public abstract class BaseFragment extends Fragment {
     }
 
     public void initListener() {
+
     }
 
     private View loadRootView(LayoutInflater inflater, ViewGroup container) {
