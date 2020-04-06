@@ -4,7 +4,6 @@ import com.lgh.mvp.base.BaseBean;
 
 public class TicketBeans extends BaseBean {
 
-
     /**
      * success : true
      * code : 10000
@@ -73,6 +72,14 @@ public class TicketBeans extends BaseBean {
             private DataBean data;
             private String request_id;
 
+            @Override
+            public String toString() {
+                return "TbkTpwdCreateResponseBean{" +
+                        "data=" + data +
+                        ", request_id='" + request_id + '\'' +
+                        '}';
+            }
+
             public DataBean getData() {
                 return data;
             }
@@ -90,6 +97,14 @@ public class TicketBeans extends BaseBean {
             }
 
             public static class DataBean {
+
+                @Override
+                public String toString() {
+                    return "DataBean{" +
+                            "model='" + model + '\'' +
+                            '}';
+                }
+
                 /**
                  * model : ￥xhQoYC66sMX￥
                  */
@@ -105,5 +120,15 @@ public class TicketBeans extends BaseBean {
                 }
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "TicketBeans{" +
+                "success=" + success +
+                ", code=" + code +
+                ", message='" + message + '\'' +
+                ", data=" + data +
+                '}';
     }
 }

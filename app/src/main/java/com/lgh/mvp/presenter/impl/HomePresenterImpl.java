@@ -37,7 +37,7 @@ public class HomePresenterImpl implements IHomePresenter {
                         if (body == null || body.getData().size() == 0) {
                             mCallback.onEmpty();
                         }
-                        mCallback.onCategorLoaded(body);
+                        mCallback.onLoadSuccess(body);
                     }
                 } else {
                     if (mCallback != null) {

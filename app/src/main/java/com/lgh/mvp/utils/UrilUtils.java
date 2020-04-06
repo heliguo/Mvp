@@ -24,7 +24,7 @@ public class UrilUtils {
         if (url.contains("http")||url.contains("https")){
             return url;
         }else {
-            return "https"+url;
+            return "http"+url;
         }
     }
 }

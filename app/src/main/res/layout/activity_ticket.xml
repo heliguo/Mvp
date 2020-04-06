@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/loading_rootview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -15,6 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/dp_10"
+            android:layout_alignParentStart="true"
             android:src="@drawable/ticket_back" />
 
         <TextView
@@ -23,9 +25,10 @@
             android:layout_centerInParent="true"
             android:text="@string/txt_ticket_title"
             android:textColor="@color/white"
-            android:textSize="14sp" />
+            android:textSize="18sp" />
 
     </RelativeLayout>
+
 
     <ImageView
         android:id="@+id/ticket_pic"
@@ -35,6 +38,7 @@
         android:layout_marginTop="30dp" />
 
     <EditText
+        android:id="@+id/ticket_tao_kl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -54,7 +58,7 @@
         android:layout_marginTop="@dimen/dp_30"
         android:background="@drawable/shape_ticket_btn"
         android:gravity="center"
-        android:text="7389"
+        android:text="@string/txt_ticket_btn"
         android:textColor="@color/white"
         android:textSize="18sp" />
 

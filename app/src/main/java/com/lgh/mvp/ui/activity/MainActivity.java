@@ -1,5 +1,7 @@
 package com.lgh.mvp.ui.activity;
 
+import android.view.View;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.lgh.mvp.R;
 import com.lgh.mvp.base.BaseActivity;
@@ -65,6 +67,7 @@ public class MainActivity extends BaseActivity {
             return true;
         });
     }
+
 
 
     private BaseFragment lastFragment = null;

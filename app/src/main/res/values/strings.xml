@@ -10,4 +10,9 @@
     <string name="goods_price_after_off">券后价:</string>
     <string name="txt_goods_sold_count">%1$d人已购买</string>
     <string name="txt_ticket_title">淘口令</string>
+    <string name="page_empty">内容为空</string>
+    <string name="page_error_retry">点击重试</string>
+    <string name="page_error">加载失败</string>
+    <string name="txt_ticket_btn">领券</string>
+    <string name="txt_default_loading">Loading</string>
 </resources>

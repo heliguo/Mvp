@@ -31,7 +31,6 @@ import com.lgh.mvp.ui.custom.CustomNestedScrollView;
 import com.lgh.mvp.ui.custom.CustomRecyclerview;
 import com.lgh.mvp.ui.rvitem.PagerRvItem;
 import com.lgh.mvp.utils.Constants;
-import com.lgh.mvp.utils.LogUtils;
 import com.lgh.mvp.utils.PresenterManager;
 import com.lgh.mvp.utils.SizeUtils;
 import com.lgh.mvp.utils.ToastUtils;
@@ -109,7 +108,6 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
             if (fragment != null) {
                 int item = fragment.looperVp.getCurrentItem() + 1;
                 fragment.looperVp.setCurrentItem(item);
-                LogUtils.e(HomePagerFragment.class, "looping... ");
                 fragment.mHandler.sendEmptyMessageDelayed(0, 2000);
             }
         }
@@ -178,13 +176,13 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
             @Override
             public void onItemClick(View view, CategoryPager.DataBean entity, int position) {
                 Log.e("TAG", "onItemClick: ");
-                TicketPresenterImpl ticketPresenter = PresenterManager.
-                        getInstance().getTicketPresenter();
-                startActivity(new Intent(mContext, TicketActivity.class));
                 String title = entity.getTitle();
                 String pict_url = entity.getPict_url();
                 String click_url = entity.getClick_url();
+                TicketPresenterImpl ticketPresenter = PresenterManager.
+                        getInstance().getTicketPresenter();
                 ticketPresenter.getTicket(title, click_url, pict_url);
+                startActivity(new Intent(mContext, TicketActivity.class));
                 view.findViewById(R.id.goods_pic).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -220,7 +218,7 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
     }
 
     @Override
-    public void onCategorLoaded(CategoryPager categoryPager) {
+    public void onLoadSuccess(CategoryPager categoryPager, Object... objects) {
         mDataBeanList.clear();
         mDataBeanList.addAll(categoryPager.getData());
         setStates(State.SUCCESS);

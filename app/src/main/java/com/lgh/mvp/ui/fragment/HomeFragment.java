@@ -24,7 +24,6 @@ public class HomeFragment extends BaseFragment implements IHomeCallback {
     @BindView(R.id.home_pager)
     ViewPager mViewPager;
 
-
     protected int getRootViewLayoutId() {
         return R.layout.base_home_fragment_layout;
     }
@@ -46,7 +45,7 @@ public class HomeFragment extends BaseFragment implements IHomeCallback {
     }
 
     @Override
-    public void onCategorLoaded(Categories categories) {
+    public void onLoadSuccess(Categories categories, Object... objects) {
         if (mAdapter != null) {
             setStates(State.SUCCESS);
             mAdapter.setGategoris(categories);
@@ -76,8 +75,11 @@ public class HomeFragment extends BaseFragment implements IHomeCallback {
         }
     }
 
+
     @Override
     protected void initView(View rootView) {
+        mTabLayout = rootView.findViewById(R.id.home_indicator);
+        mViewPager = rootView.findViewById(R.id.home_pager);
         mTabLayout.setupWithViewPager(mViewPager);
         mAdapter = new HomePagerAdapter(getChildFragmentManager());
         mViewPager.setAdapter(mAdapter);

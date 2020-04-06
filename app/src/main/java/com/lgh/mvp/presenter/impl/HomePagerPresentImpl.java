@@ -1,11 +1,8 @@
 package com.lgh.mvp.presenter.impl;
 
-import android.util.Log;
-
 import com.lgh.mvp.model.Api;
 import com.lgh.mvp.model.domain.CategoryPager;
 import com.lgh.mvp.presenter.ICategoryPagerPresenter;
-import com.lgh.mvp.utils.LogUtils;
 import com.lgh.mvp.utils.RetrofitManaer;
 import com.lgh.mvp.utils.UrilUtils;
 import com.lgh.mvp.view.ICategoryPagerCallback;
@@ -85,7 +82,7 @@ public class HomePagerPresentImpl implements ICategoryPagerPresenter {
                 } else {
                     List<CategoryPager.DataBean> dataBeans = data.subList(data.size() - 5, data.size());
                     callback.onLooperListLoaded(dataBeans, id);
-                    callback.onCategorLoaded(body);
+                    callback.onLoadSuccess(body);
                     pages.put(id, currentPage);
                 }
             }

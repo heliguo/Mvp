@@ -13,7 +13,7 @@ public interface IBaseCallback<T extends BaseBean> {
      *
      * @param t
      */
-    void onCategorLoaded(T t);
+    void onLoadSuccess(T t, Object... objects);
 
     /**
      * 网络加载失败

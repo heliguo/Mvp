@@ -16,10 +16,16 @@ public class PresenterManager {
     }
 
     private PresenterManager() {
-        mHomePagerPresent = new HomePagerPresentImpl();
-        mHomePresenter = new HomePresenterImpl();
-        mTicketPresenter = new TicketPresenterImpl();
+        if (mHomePagerPresent == null) {
+            mHomePagerPresent = new HomePagerPresentImpl();
+        }
+        if (mHomePresenter == null) {
+            mHomePresenter = new HomePresenterImpl();
+        }
 
+        if (mTicketPresenter == null) {
+            mTicketPresenter = new TicketPresenterImpl();
+        }
     }
 
     public HomePagerPresentImpl getHomePagerPresent() {

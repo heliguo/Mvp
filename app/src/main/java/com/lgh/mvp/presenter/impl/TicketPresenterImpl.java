@@ -1,10 +1,12 @@
 package com.lgh.mvp.presenter.impl;
 
+import android.opengl.GLES10;
+import android.util.Log;
+
 import com.lgh.mvp.model.Api;
 import com.lgh.mvp.model.domain.TicketBeans;
 import com.lgh.mvp.model.domain.TicketParams;
 import com.lgh.mvp.presenter.ITicketPresenter;
-import com.lgh.mvp.ui.dialog.DialogLoading;
 import com.lgh.mvp.utils.LogUtils;
 import com.lgh.mvp.utils.RetrofitManaer;
 import com.lgh.mvp.utils.UrilUtils;
@@ -20,10 +22,30 @@ import retrofit2.Retrofit;
 public class TicketPresenterImpl implements ITicketPresenter {
 
     private ITicketCallBack mITicketCallBack;
-    private DialogLoading mDialogLoading;
+
+    enum TicketState {
+        NONE,
+        LOADING,
+        SUCCESS,
+        ERROR
+    }
+
+    private TicketState currentState = TicketState.NONE;
+    private TicketBeans ticketBeans;
+    private String mCover;
+    private String mTitle;
+    private String mUrl;
+
 
     @Override
     public void getTicket(String title, String url, String cover) {
+        currentState = TicketState.LOADING;
+        this.handlerLoading();
+        this.mCover = cover;
+        this.mTitle = title;
+        this.mUrl = url;
+        if (mITicketCallBack != null)
+            mITicketCallBack.onLoading();
         Retrofit retrofit = RetrofitManaer.getInstance().getRetrofit();
         Api api = retrofit.create(Api.class);
         String ticketUrl = UrilUtils.getTicketUrl(url);
@@ -33,27 +55,51 @@ public class TicketPresenterImpl implements ITicketPresenter {
             @Override
             public void onResponse(Call<TicketBeans> call, Response<TicketBeans> response) {
                 int code = response.code();
-
-                LogUtils.e(TicketPresenterImpl.class, "code:  " + code);
                 if (code == HttpURLConnection.HTTP_OK) {
-                    TicketBeans ticketBeans = response.body();
-                    if (ticketBeans != null)
-                        mITicketCallBack.onItcketLoaded(cover, ticketBeans);
+                    currentState = TicketState.SUCCESS;
+                    ticketBeans = response.body();
+                    handlerLoadSuccess();
                 } else {
-                    handlerNetWorkError();
+                    handlerNetWorkError(title, url, cover);
                 }
             }
 
             @Override
             public void onFailure(Call<TicketBeans> call, Throwable t) {
-                handlerNetWorkError();
+                handlerNetWorkError(title, url, cover);
             }
         });
+    }
+
+    private void handlerLoadSuccess() {
+        if (mITicketCallBack != null) {
+            if (ticketBeans != null) {
+                mITicketCallBack.onLoadSuccess(ticketBeans, mCover);
+            } else {
+                mITicketCallBack.onEmpty();
+            }
+        }
+    }
+
+    private void handlerLoading() {
+        if (mITicketCallBack != null) {
+            mITicketCallBack.onLoading();
+        }
     }
 
     @Override
     public void registerCallback(ITicketCallBack callback) {
         this.mITicketCallBack = callback;
+        if (currentState != TicketState.NONE) {
+            //状态已经改变，可以更新UI
+            if (currentState == TicketState.SUCCESS) {
+                handlerLoadSuccess();
+            } else if (currentState == TicketState.ERROR) {
+                handlerNetWorkError(mTitle, mUrl, mCover);
+            } else if (currentState == TicketState.LOADING) {
+                handlerLoading();
+            }
+        }
 
     }
 
@@ -62,8 +108,11 @@ public class TicketPresenterImpl implements ITicketPresenter {
         mITicketCallBack = null;
     }
 
-    private void handlerNetWorkError() {
-        mITicketCallBack.onError();
+    private void handlerNetWorkError(String title, String url, String cover) {
+        currentState = TicketState.ERROR;
+        if (mITicketCallBack != null)
+            mITicketCallBack.onError(title, url, cover);
     }
+
 
 }
