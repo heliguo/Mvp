@@ -1,10 +1,16 @@
 package com.lgh.mvp.base;
 
+import android.content.Context;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 
 import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import butterknife.ButterKnife;
@@ -35,6 +41,20 @@ public abstract class BaseActivity extends AppCompatActivity {
         initView();
         initListener();
         initPresenter();
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull String name, @NonNull Context context, @NonNull AttributeSet attrs) {
+
+//        //全局变灰
+//        Paint paint = new Paint();
+//        ColorMatrix cm = new ColorMatrix();
+//        cm.setSaturation(0);
+//        paint.setColorFilter(new ColorMatrixColorFilter(cm));
+//        //关键点 开启了硬件加速
+//        getWindow().getDecorView().setLayerType(View.LAYER_TYPE_HARDWARE, paint);
+        return super.onCreateView(name, context, attrs);
     }
 
     protected abstract void initPresenter();
