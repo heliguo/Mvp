@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -23,11 +22,6 @@ import com.lgh.mvp.presenter.impl.TicketPresenterImpl;
 import com.lgh.mvp.ui.custom.loadview.PageLayout;
 import com.lgh.mvp.utils.PresenterManager;
 import com.lgh.mvp.view.ITicketCallBack;
-
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 public class TicketActivity extends BaseActivity implements ITicketCallBack {
 
