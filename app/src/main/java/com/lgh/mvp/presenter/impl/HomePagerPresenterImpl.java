@@ -18,7 +18,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class HomePagerPresentImpl implements ICategoryPagerPresenter {
+public class HomePagerPresenterImpl implements ICategoryPagerPresenter {
 
     private Map<Integer, Integer> pages = new HashMap<>();
 

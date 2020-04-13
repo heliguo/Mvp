@@ -5,6 +5,8 @@ import com.lgh.mvp.view.ISearchCallback;
 
 public interface ISearchPresenter extends IBasePresenter<ISearchCallback> {
 
+    void saveHistories(String history);
+
     /**
      * 获取搜索历史内容
      */

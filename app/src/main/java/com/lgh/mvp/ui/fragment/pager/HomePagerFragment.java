@@ -23,7 +23,7 @@ import com.lgh.mvp.R;
 import com.lgh.mvp.base.BaseFragment;
 import com.lgh.mvp.model.domain.Categories;
 import com.lgh.mvp.model.domain.CategoryPager;
-import com.lgh.mvp.presenter.impl.HomePagerPresentImpl;
+import com.lgh.mvp.presenter.impl.HomePagerPresenterImpl;
 import com.lgh.mvp.presenter.impl.TicketPresenterImpl;
 import com.lgh.mvp.ui.activity.TicketActivity;
 import com.lgh.mvp.ui.adapter.LooperPagerAdapter;
@@ -56,7 +56,7 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
         RViewCreate, SwipeRefreshHelper.SwipeRefreshListener {
 
     private Context mContext;
-    private HomePagerPresentImpl mPagerPresent;
+    private HomePagerPresenterImpl mPagerPresent;
     private int materialId;
 
     @BindView(R.id.home_rv_height)

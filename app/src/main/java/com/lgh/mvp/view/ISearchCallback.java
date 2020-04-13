@@ -1,6 +1,7 @@
 package com.lgh.mvp.view;
 
 import com.lgh.mvp.base.IBaseCallback;
+import com.lgh.mvp.model.domain.SearchRecommend;
 import com.lgh.mvp.model.domain.SearchResult;
 
 import java.util.List;
@@ -24,5 +25,5 @@ public interface ISearchCallback extends IBaseCallback<SearchResult> {
      *
      * @param recommend
      */
-    void onRecommendWordsLoaded(List<String> recommend);
+    void onRecommendWordsLoaded(List<SearchRecommend.DataBean > recommend);
 }
